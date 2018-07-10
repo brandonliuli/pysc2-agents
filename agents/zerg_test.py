@@ -43,7 +43,7 @@ class ZergAgent(base_agent.BaseAgent):
         self.attack_coordinates = (12, 16)
 
     zerglings = self.get_units_by_type(obs, units.Zerg.Zergling)
-    if len(zerglings) >= 10:
+    if len(zerglings) >= 2:
       if self.unit_type_is_selected(obs, units.Zerg.Zergling):
         if self.can_do(obs, actions.FUNCTIONS.Attack_minimap.id):
           return actions.FUNCTIONS.Attack_minimap("now",
@@ -54,16 +54,16 @@ class ZergAgent(base_agent.BaseAgent):
 
     spawning_pools = self.get_units_by_type(obs, units.Zerg.SpawningPool)
     drones = self.get_units_by_type(obs, units.Zerg.Drone)
-    if len(spawning_pools) == 0 and len(drones) > 14:
+    if len(spawning_pools) == 0 and len(drones) > 15:
       if self.unit_type_is_selected(obs, units.Zerg.Drone):
         if self.can_do(obs, actions.FUNCTIONS.Build_SpawningPool_screen.id):
-          x = random.randint(0, 83)
-          y = random.randint(0, 83)
+          x = random.randint(0, 63)
+          y = random.randint(0, 63)
           
           return actions.FUNCTIONS.Build_SpawningPool_screen("now", (x, y))
     
       drones = self.get_units_by_type(obs, units.Zerg.Drone)
-      if len(drones) > 0:
+      if len(drones) > 15:
         drone = random.choice(drones)
 
         return actions.FUNCTIONS.select_point("select_all_type", (drone.x,
@@ -72,11 +72,11 @@ class ZergAgent(base_agent.BaseAgent):
     if self.unit_type_is_selected(obs, units.Zerg.Larva):
       free_supply = (obs.observation.player.food_cap -
                      obs.observation.player.food_used)
-      if free_supply <= 1:
+      if free_supply == 0:
         if self.can_do(obs, actions.FUNCTIONS.Train_Overlord_quick.id):
           return actions.FUNCTIONS.Train_Overlord_quick("now")
 
-      if len(drones) <= 14 and self.can_do(obs, actions.FUNCTIONS.Train_Drone_quick.id):
+      if len(drones) <= 15 and self.can_do(obs, actions.FUNCTIONS.Train_Drone_quick.id):
           return actions.FUNCTIONS.Train_Drone_quick("now")
       if self.can_do(obs, actions.FUNCTIONS.Train_Zergling_quick.id):
         return actions.FUNCTIONS.Train_Zergling_quick("now")

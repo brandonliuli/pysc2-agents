@@ -15,6 +15,7 @@ from pysc2.env import available_actions_printer
 from pysc2.env import sc2_env
 from pysc2.lib import stopwatch, features
 import tensorflow as tf
+from agents.zerg_test import ZergAgent
 
 from run_loop import run_loop
 
@@ -22,26 +23,26 @@ COUNTER = 0
 LOCK = threading.Lock()
 FLAGS = flags.FLAGS
 flags.DEFINE_bool("training", True, "Whether to train agents.")
-flags.DEFINE_bool("continuation", False, "Continuously training.")
-flags.DEFINE_float("learning_rate", 5e-4, "Learning rate for training.")
+flags.DEFINE_bool("continuation", True, "Continuously training.")
+flags.DEFINE_float("learning_rate", 5e-2, "Learning rate for training.")
 flags.DEFINE_float("discount", 0.99, "Discount rate for future rewards.")
 flags.DEFINE_integer("max_steps", int(1e5), "Total steps for training.")
-flags.DEFINE_integer("snapshot_step", int(1e3), "Step for snapshot.")
+flags.DEFINE_integer("snapshot_step", int(1e2), "Step for snapshot.")
 flags.DEFINE_string("snapshot_path", "./snapshot/", "Path for snapshot.")
 flags.DEFINE_string("log_path", "./log/", "Path for log.")
 flags.DEFINE_string("device", "0", "Device for training.")
 
-flags.DEFINE_string("map", "MoveToBeacon", "Name of a map to use.")
+flags.DEFINE_string("map", "Simple64", "Name of a map to use.")
 flags.DEFINE_bool("render", False, "Whether to render with pygame.")
 flags.DEFINE_integer("step_mul", 8, "Game steps per agent step.")
 
 flags.DEFINE_string("agent", "agents.a3c_agent.A3CAgent", "Which agent to run.")
-flags.DEFINE_string("net", "fcn", "atari or fcn.")
-flags.DEFINE_integer("max_agent_steps", 60, "Total agent steps.")
+flags.DEFINE_string("net", "custom", "atari, fcn, or custom.")
+flags.DEFINE_integer("max_agent_steps", int(1e9), "Total agent steps.")
 
 flags.DEFINE_bool("profile", False, "Whether to turn on code profiling.")
 flags.DEFINE_bool("trace", False, "Whether to trace the code execution.")
-flags.DEFINE_integer("parallel", 1, "How many instances to run in parallel.")
+flags.DEFINE_integer("parallel", 2, "How many instances to run in parallel.")
 flags.DEFINE_bool("save_replay", False, "Whether to save a replay at the end.")
 
 FLAGS(sys.argv)
@@ -65,7 +66,9 @@ if not os.path.exists(SNAPSHOT):
 def run_thread(agent, map_name, visualize):
     with sc2_env.SC2Env(
             map_name=map_name,
-            players=[sc2_env.Agent(sc2_env.Race.zerg),
+            players=[sc2_env.Agent(sc2_env.Race.terran),
+                     sc2_env.Agent(sc2_env.Race.zerg)
+                     #sc2_env.Bot(race=sc2_env.Race.zerg, difficulty=sc2_env.Difficulty.very_easy)
                      ],
             agent_interface_format=features.AgentInterfaceFormat(
                 feature_dimensions=features.Dimensions(screen=64, minimap=64),
@@ -76,7 +79,8 @@ def run_thread(agent, map_name, visualize):
 
         # Only for a single player!
         replay_buffer = []
-        for recorder, is_done in run_loop([agent], env, MAX_AGENT_STEPS):
+        zerg_agent = ZergAgent()
+        for recorder, is_done in run_loop([agent, zerg_agent], env, MAX_AGENT_STEPS):
             if FLAGS.training:
                 replay_buffer.append(recorder)
                 if is_done:
@@ -138,7 +142,7 @@ def _main(unused_argv):
         threads.append(t)
         t.daemon = True
         t.start()
-        time.sleep(5)
+        time.sleep(45)
 
     run_thread(agents[-1], FLAGS.map, FLAGS.render)
 

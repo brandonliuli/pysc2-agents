@@ -9,6 +9,8 @@ from pysc2.lib import actions
 import utils as U
 from agents.network import build_net
 
+MAX_SAMPLES_TO_COMMIT = 500
+BATCH_SIZE = 24
 
 class A3CAgent(object):
   """An agent specifically for solving the mini-game maps."""
@@ -148,6 +150,8 @@ class A3CAgent(object):
   def update(self, rbs, disc, lr, cter):
     # Compute R, which is value of the last observation
     obs = rbs[-1][-1]
+    #if len(rbs) > MAX_SAMPLES_TO_COMMIT:
+    #  rbs = np.random.choice(rbs[:-1], MAX_SAMPLES_TO_COMMIT - 1, replace=False) + [rbs[-1]]
     if obs.last():
       R = 0
     else:
@@ -210,19 +214,29 @@ class A3CAgent(object):
     screens = np.concatenate(screens, axis=0)
     infos = np.concatenate(infos, axis=0)
 
-    # Train
-    feed = {self.minimap: minimaps,
-            self.screen: screens,
-            self.info: infos,
-            self.value_target: value_target,
-            self.valid_spatial_action: valid_spatial_action,
-            self.spatial_action_selected: spatial_action_selected,
-            self.valid_non_spatial_action: valid_non_spatial_action,
-            self.non_spatial_action_selected: non_spatial_action_selected,
-            self.learning_rate: lr}
-    _, summary = self.sess.run([self.train_op, self.summary_op], feed_dict=feed)
-    self.summary_writer.add_summary(summary, cter)
+    for minimaps, screens, infos, value_target, valid_spatial_action, spatial_action_selected, valid_non_spatial_action, \
+        non_spatial_action_selected in [self.batch(mask) for mask in [minimaps, screens, infos, value_target, valid_spatial_action,
+                                                    spatial_action_selected,valid_non_spatial_action, non_spatial_action_selected]]:
 
+      # Train in batches
+
+      feed = {self.minimap: minimaps,
+              self.screen: screens,
+              self.info: infos,
+              self.value_target: value_target,
+              self.valid_spatial_action: valid_spatial_action,
+              self.spatial_action_selected: spatial_action_selected,
+              self.valid_non_spatial_action: valid_non_spatial_action,
+              self.non_spatial_action_selected: non_spatial_action_selected,
+              self.learning_rate: lr}
+      print('Commiting {} replay samples'.format(len(minimaps)))
+      _, summary = self.sess.run([self.train_op, self.summary_op], feed_dict=feed)
+      self.summary_writer.add_summary(summary, cter)
+
+  def batch(self, iterable, n=1):
+    l = len(iterable)
+    for ndx in range(0, l, n):
+      yield iterable[ndx:min(ndx + n, l)]
 
   def save_model(self, path, count):
     self.saver.save(self.sess, path+'/model.pkl', count)
