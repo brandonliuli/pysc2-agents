@@ -1,0 +1,13 @@
+{(): 21, 
+(ArgumentType(id=1, name='minimap', sizes=(64, 64), fn=None, values=None),): 1, 
+(ArgumentType(id=6, name='select_point_act', sizes=(4,), fn=None, values=None), ArgumentType(id=0, name='screen', sizes=(64, 64), fn=None, values=None)): 1,
+(ArgumentType(id=7, name='select_add', sizes=(2,), fn=None, values=None), ArgumentType(id=0, name='screen', sizes=(64, 64), fn=None, values=None), ArgumentType(id=2, name='screen2', sizes=(64, 64), fn=None, values=None)): 1, 
+(ArgumentType(id=4, name='control_group_act', sizes=(5,), fn=None, values=None), ArgumentType(id=5, name='control_group_id', sizes=(10,), fn=None, values=None)): 1, 
+(ArgumentType(id=8, name='select_unit_act', sizes=(4,), fn=None, values=None), ArgumentType(id=9, name='select_unit_id', sizes=(500,), fn=None, values=None)): 1, 
+(ArgumentType(id=10, name='select_worker', sizes=(4,), fn=None, values=None),): 1, 
+(ArgumentType(id=7, name='select_add', sizes=(2,), fn=None, values=None),): 2, 
+(ArgumentType(id=12, name='unload_id', sizes=(500,), fn=None, values=None),): 1, 
+(ArgumentType(id=11, name='build_queue_id', sizes=(10,), fn=None, values=None),): 1, 
+(ArgumentType(id=3, name='queued', sizes=(2,), fn=None, values=None), ArgumentType(id=0, name='screen', sizes=(64, 64), fn=None, values=None)): 163, 
+(ArgumentType(id=3, name='queued', sizes=(2,), fn=None, values=None), ArgumentType(id=1, name='minimap', sizes=(64, 64), fn=None, values=None)): 19, 
+(ArgumentType(id=3, name='queued', sizes=(2,), fn=None, values=None),): 328}
