@@ -10,7 +10,7 @@ import utils as U
 from agents.network import build_net
 
 MAX_SAMPLES_TO_COMMIT = 500
-BATCH_SIZE = 24
+BATCH_SIZE = 100
 
 class A3CAgent(object):
   """An agent specifically for solving the mini-game maps."""
@@ -215,8 +215,8 @@ class A3CAgent(object):
     infos = np.concatenate(infos, axis=0)
 
     for minimaps, screens, infos, value_target, valid_spatial_action, spatial_action_selected, valid_non_spatial_action, \
-        non_spatial_action_selected in [self.batch(mask) for mask in [minimaps, screens, infos, value_target, valid_spatial_action,
-                                                    spatial_action_selected,valid_non_spatial_action, non_spatial_action_selected]]:
+        non_spatial_action_selected in zip(*[self.batch(mask, BATCH_SIZE) for mask in [minimaps, screens, infos, value_target, valid_spatial_action,
+                                                    spatial_action_selected, valid_non_spatial_action, non_spatial_action_selected]]):
 
       # Train in batches
 

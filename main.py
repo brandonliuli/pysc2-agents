@@ -23,7 +23,7 @@ COUNTER = 0
 LOCK = threading.Lock()
 FLAGS = flags.FLAGS
 flags.DEFINE_bool("training", True, "Whether to train agents.")
-flags.DEFINE_bool("continuation", True, "Continuously training.")
+flags.DEFINE_bool("continuation", False, "Continuously training.")
 flags.DEFINE_float("learning_rate", 5e-2, "Learning rate for training.")
 flags.DEFINE_float("discount", 0.99, "Discount rate for future rewards.")
 flags.DEFINE_integer("max_steps", int(1e5), "Total steps for training.")
@@ -42,7 +42,7 @@ flags.DEFINE_integer("max_agent_steps", int(1e9), "Total agent steps.")
 
 flags.DEFINE_bool("profile", False, "Whether to turn on code profiling.")
 flags.DEFINE_bool("trace", False, "Whether to trace the code execution.")
-flags.DEFINE_integer("parallel", 2, "How many instances to run in parallel.")
+flags.DEFINE_integer("parallel", 1, "How many instances to run in parallel.")
 flags.DEFINE_bool("save_replay", False, "Whether to save a replay at the end.")
 
 FLAGS(sys.argv)
